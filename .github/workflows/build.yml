@@ -68,6 +68,19 @@ jobs:
       run: |
         [System.IO.File]::AppendAllText($env:GITHUB_ENV, "VULKAN_SDK=C:\VulkanSDK\${{env.VULKAN_VERSION}}" + [Environment]::NewLine)
 
+    - name: Cache vcpkg
+      uses: actions/cache@v5
+      id: cache_vcpkg
+      with:
+        path: C:/vcpkg/installed
+        key: vcpkg
+    - name: vcpkg
+      if: steps.cache_vcpkg.outputs.cache-hit != 'true'
+      run: |
+        vcpkg install spirv-tools --triplet ${{matrix.Settings.Triplet}}
+    - name: List vcpkg files
+      run: Get-ChildItem -Path "C:\vcpkg" -File -Recurse | Select-Object FullName
+
     - name: Configure
       run: >
         cmake
@@ -140,7 +153,7 @@ jobs:
         run: |
           cp "README.md" "Release/ReadMe.txt"
           cp "LICENSE" "Release/License.txt"
-  
+
       - name: Compress artifacts
         run: |
           7z a "Release/${{env.Title}}.zip" "${{github.workspace}}/Release/*" -mx=9

@@ -5,9 +5,8 @@ env:
   GH_TOKEN: "${{github.token}}"
   Branch: "${{github.ref_name}}"
   Artifacts: "build/external/vulkancts/modules/vulkan/Release"
-  Extension: "*"
-  Title: "${{github.event.repository.name}}"
-  Executable: "deqp-vk.exe"
+  Extension: "*.exe"
+  Title: "Khronos Conformance Testing Suite"
   VULKAN_VERSION: "1.3.296.0"
 
 on:
@@ -79,8 +78,6 @@ jobs:
         -B "${{github.workspace}}/build"
         -DCMAKE_BUILD_TYPE=${{matrix.Configuration}}
         -DCMAKE_PREFIX_PATH=C:\vcpkg\installed\${{matrix.Settings.Triplet}}
-#        -DSOMELIBRARY_INCLUDE_DIRS=C:\vcpkg\installed\${{matrix.Settings.Triplet}}\include\SOMELIBRARY
-#        -DSOMELIBRARY_LIB=C:\vcpkg\installed\${{matrix.Settings.Triplet}}\lib\SOMELIBRARY.lib
 
     - name: Build
       run: >
@@ -88,17 +85,6 @@ jobs:
         --build "${{github.workspace}}/build"
         --config "${{matrix.Configuration}}"
         --target deqp-vk
-
-    - name: List files
-      run: Get-ChildItem -Path "." -File -Recurse | Select-Object FullName
-
-#    - name: Deploy
-#      shell: cmd
-#      run: |
-#        windeployqt.exe "${{github.workspace}}/${{env.Artifacts}}/${{env.Executable}}"
-#        If exist "C:\vcpkg\installed\${{matrix.Settings.Triplet}}\bin\*.dll"          (move "C:\vcpkg\installed\${{matrix.Settings.Triplet}}\bin\*.dll"        "${{env.Artifacts}}")
-#        If exist "C:\vcpkg\installed\${{matrix.Settings.Triplet}}\debug\bin\*.dll"    (move "C:\vcpkg\installed\${{matrix.Settings.Triplet}}\debug\bin\*.dll"  "${{env.Artifacts}}")
-#        move "assets" "${{env.Artifacts}}"
 
     - name: Upload artifacts
       uses: actions/upload-artifact@v4

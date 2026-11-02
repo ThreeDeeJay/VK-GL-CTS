@@ -70,7 +70,7 @@ jobs:
 
     - name: Fetch sources
       run: |
-        external/fetch_sources.py 
+        python external/fetch_sources.py 
 
     - name: Configure
       run: >

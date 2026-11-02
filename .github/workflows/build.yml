@@ -4,10 +4,10 @@ name: Build
 env:
   GH_TOKEN: "${{github.token}}"
   Branch: "${{github.ref_name}}"
-  Artifacts: "build/Release"
-  Extension: "*" # "*.exe" # "*.dll"
+  Artifacts: "build/external/vulkancts/modules/vulkan/Release"
+  Extension: "*"
   Title: "${{github.event.repository.name}}"
-  Executable: "${{github.event.repository.name}}.exe" # *
+  Executable: "deqp-vk.exe"
   VULKAN_VERSION: "1.3.296.0"
 
 on:
@@ -79,8 +79,6 @@ jobs:
         -B "${{github.workspace}}/build"
         -DCMAKE_BUILD_TYPE=${{matrix.Configuration}}
         -DCMAKE_PREFIX_PATH=C:\vcpkg\installed\${{matrix.Settings.Triplet}}
-        -DSPIRV_TOOLS_ABS_PATH=C:\vcpkg\buildtrees\spirv-tools\src\-1.4.357.0-cb06ed3250.clean
-        -DSPIRV_HEADERS_ABS_PATH=C:\vcpkg\buildtrees\spirv-headers\src\-1.4.357.0-c9568817e0.clean
 #        -DSOMELIBRARY_INCLUDE_DIRS=C:\vcpkg\installed\${{matrix.Settings.Triplet}}\include\SOMELIBRARY
 #        -DSOMELIBRARY_LIB=C:\vcpkg\installed\${{matrix.Settings.Triplet}}\lib\SOMELIBRARY.lib
 

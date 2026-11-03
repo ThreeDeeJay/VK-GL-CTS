@@ -18,7 +18,7 @@ on:
 jobs:
   Build:
     name: ${{matrix.Settings.Name}}-${{matrix.Configuration}}
-    runs-on: windows-2022
+    runs-on: windows-2025
     strategy:
       matrix:
         Configuration: [Release]
@@ -59,7 +59,7 @@ jobs:
         -B "${{github.workspace}}/build"
         -DCMAKE_BUILD_TYPE=${{matrix.Configuration}}
         -DCMAKE_PREFIX_PATH=C:\vcpkg\installed\${{matrix.Settings.Triplet}}
-        -DOUTPUT_NAME=deqp-vk-${{matrix.Settings.Name}}.exe
+        -DCMAKE_EXECUTABLE_SUFFIX=${{matrix.Settings.Name}}.exe
 
     - name: Build
       run: >

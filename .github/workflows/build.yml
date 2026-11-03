@@ -7,7 +7,6 @@ env:
   Artifacts: "build/external/vulkancts/modules/vulkan/Release"
   Extension: "*.exe"
   Title: "Khronos Conformance Testing Suite"
-  VULKAN_VERSION: "1.3.296.0"
 
 on:
   push:
@@ -49,24 +48,6 @@ jobs:
         --filter=blob:none
         --recurse-submodules
 
-    - name: Cache Vulkan SDK
-      id: cache-vulkan-sdk
-      uses: actions/cache@v5
-      with:
-        path: "C:\\VulkanSDK\\${{env.VULKAN_VERSION}}"
-        key: VulkanSDK-${{env.VULKAN_VERSION}}
-    - name: Install Vulkan SDK
-      if: steps.cache-vulkan-sdk.outputs.cache-hit != 'true'
-      shell: cmd
-      run: |
-        curl --ssl-revoke-best-effort --fail -L "https://sdk.lunarg.com/sdk/download/${{env.VULKAN_VERSION}}/windows/VulkanSDK-${{env.VULKAN_VERSION}}-Installer.exe" -o "VulkanSDK.exe" || true
-        curl --ssl-revoke-best-effort --fail -L "https://sdk.lunarg.com/sdk/download/${{env.VULKAN_VERSION}}/windows/vulkansdk-windows-X64-${{env.VULKAN_VERSION}}.exe" -o "VulkanSDK.exe" || true
-        VulkanSDK.exe --accept-licenses --default-answer --confirm-command install com.lunarg.vulkan.32bit
-    - name: Set VULKAN_SDK
-      shell: pwsh
-      run: |
-        [System.IO.File]::AppendAllText($env:GITHUB_ENV, "VULKAN_SDK=C:\VulkanSDK\${{env.VULKAN_VERSION}}" + [Environment]::NewLine)
-
     - name: Fetch sources
       run: |
         python external/fetch_sources.py 
@@ -78,6 +59,7 @@ jobs:
         -B "${{github.workspace}}/build"
         -DCMAKE_BUILD_TYPE=${{matrix.Configuration}}
         -DCMAKE_PREFIX_PATH=C:\vcpkg\installed\${{matrix.Settings.Triplet}}
+        -DOUTPUT_NAME=deqp-vk-${{matrix.Settings.Name}}.exe
 
     - name: Build
       run: >
@@ -119,18 +101,19 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: ${{env.Title}}-Win32-Release
-          path: Release/Win32/
+          path: Release/
 
       - name: Download Artifacts - Win64
         uses: actions/download-artifact@v4
         with:
           name: ${{env.Title}}-Win64-Release
-          path: Release/Win64/
+          path: Release/
 
       - name: Deploy
         run: |
           cp "README.md" "Release/ReadMe.txt"
           cp "LICENSE" "Release/License.txt"
+          cp "scripts/qpa_image_viewer.html" "Release/qpa_image_viewer.html"
 
       - name: Compress artifacts
         run: |

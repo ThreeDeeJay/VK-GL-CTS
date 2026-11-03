@@ -58,7 +58,6 @@ jobs:
         -A "${{matrix.Settings.Platform}}"
         -B "${{github.workspace}}/build"
         -DCMAKE_BUILD_TYPE=${{matrix.Configuration}}
-        -DCMAKE_EXECUTABLE_SUFFIX=-${{matrix.Settings.Name}}.exe
 
     - name: Build
       run: >
@@ -100,19 +99,22 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: ${{env.Title}}-Win32-Release
-          path: Release/
+          path: Artifacts/Win32/
 
       - name: Download Artifacts - Win64
         uses: actions/download-artifact@v4
         with:
           name: ${{env.Title}}-Win64-Release
-          path: Release/
+          path: Release/Win64/
 
       - name: Deploy
         run: |
+          mkdir "Release"
           cp "README.md" "Release/ReadMe.txt"
           cp "LICENSE" "Release/License.txt"
           cp "scripts/qpa_image_viewer.html" "Release/qpa_image_viewer.html"
+          cp "Artifacts/Win32/deqp-vk.exe" "Release/deqp-vk-Win32.exe"
+          cp "Artifacts/Win64/deqp-vk.exe" "Release/deqp-vk-Win64.exe"
 
       - name: Compress artifacts
         run: |
